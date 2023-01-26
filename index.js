@@ -1,171 +1,65 @@
 // importando o express
 const express = require('express');
 
+// importando o body-parser
+const bodyParser = require('body-parser');
+
 // importando o dotenv
 const dotenv = require('dotenv');
 require('dotenv').config();
 
-// importando o bcrypt
-const bcrypt = require('bcrypt');
-
-// importando o jsonWebToken
+// importando a biblioteca que verifica o token
 const jwt = require('jsonwebtoken');
 
-// importando o validator
-const validator = require('validator');
+// importando nosso verificador de token bolado
+const verifyJWT = require('./verifyJWT');
 
-// importando o mysql
-const mysql = require("mysql2");
+// importando o middleware de sessão
+const session = require('express-session');
 
-// importando o body-parser
-const bodyParser = require('body-parser');
-
-// Variaveis de Ambiente
+// importando as rotas
+const access = require('./routes/access');
 
 // Porta de funcionamento do servidor (não colocar no .env)
 const PORT = process.env.PORT || 3000;
 
-// Variaveis do banco
-const DB = {
-    HOST: process.env.HOST || 'localhost',
-    USER: process.env.USER || 'root',
-    PASS: process.env.PASS || '',
-    NAME: process.env.NAME || 'test'
-}
-
-// Variaveis do auth token
-const JWT_SECRET = process.env.JWT_SECRET
-const ISSUER = process.env.ISSUER
+// Segredo do token
+const SECRET = process.env.JWT_SECRET
 
 // instanciando o app
 const app = express();
 
-// usando o body-parser
+// usando json no corpo
 app.use(bodyParser.json());
 
-// função principal (assincrona, pois é necessário aguardar a conexão com o banco)
+// função principal
 async function main() {
 
-    // Conexão com o banco de dados
-    const connection = mysql.createConnection({
-        host: DB.HOST,
-        user: DB.USER,
-        password: DB.PASS,
-        database: DB.NAME
-    });
+    app.use(session({
+        secret: SECRET,
+        resave: false,
+        saveUninitialized: true
+    }));
+
 
     // Rota de cadastro
-    app.post('/signup', (req, res) => {
+    app.use('/access', access)
 
-        // Extraindo os dados do usuário vindo na resuisição
-        const { nome, email, senha } = req.body;
-
-        // Validando as entradas
-        if (validator.isEmpty(nome)) {
-            res.status(400).send({ message: "Nome inválido" });
-            return;
-        }
-        if (!validator.isEmail(email)) {
-            res.status(400).send({ message: "Email inválido" });
-            return;
-        }
-        if (!validator.isStrongPassword(senha)) {
-            res.status(400).send({ message: "Senha fraca" });
-            return;
-        }
-
-        // Gerando uma salted hash da senha (salted é temperada, ou seja, a senha é unica dentro da nossa aplicação )
-        const hash = bcrypt.hashSync(senha, 10);
-
-        // Preparando a string SQL
-        const sql = 'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)';
-
-        // arranjando os dados que serão enviados pro banco
-        const data = [nome, email, hash];
-
-        // Execução da query de inserção
-        connection.query(sql, data, (err, results) => {
-
-            // Tratando erros
-            if (err) {
-                console.log(err);
-
-                // Email duplicado
-                if (err.code.includes("ER_DUP_ENTRY")) {
-                    res.status(401).json({ message: 'Erro ao cadastrar usuário, email em uso' });
-                    return;
-                }
-
-                res.status(500).json({ message: 'Erro ao cadastrar usuário' });
-                return;
-            } else {
-                // gras a deus foi
-                res.json({ message: 'Usuário cadastrado com sucesso' });
-                return;
-            }
-        });
+    // Responsavel por servir a rota raiz
+    app.get('/', (req, res) => {
+        res.sendFile(__dirname + '/public/index.html');
     });
 
-    // Rota de login
-    app.post('/login', (req, res) => {
+    app.get('/login', (req, res) => {
+        res.sendFile(__dirname + '/public/login.html');
+    });
 
-        // Extraindo os dados do usuário vindo na resuisição
-        const { email, senha } = req.body;
+    app.get('/signup', (req, res) => {
+        res.sendFile(__dirname + '/public/sign.html');
+    });
 
-        // Validando as entradas
-        if (!validator.isEmail(email)) {
-            res.status(400).send({ message: "Email inválido" });
-            return;
-        }
-
-        // Sugestão
-
-        /** Verificar o número de tentativas de login, implementar uma estratégia de bloqueio de conta. Armazenando o número de tentativas de login, a horário da última tentativa de login e o ip que tentou o login para cada usuário do banco de dados. A cada tentativa de login, verificar se o usuário atingiu o limite de tentativas permitidas e, se sim, bloquear temporariamente a conta do usuário. Notificaro dono da conta informando o ip que realizou a façanha usando req.ip. */
-
-        // Preparando a string SQL
-        const sql = 'SELECT senha FROM usuarios WHERE email = ?';
-
-        // dados que serão verificados no banco
-        const data = [email];
-
-        // Execução da query
-        connection.query(sql, data, (err, results) => {
-
-            // Tratando possiveis erros
-            if (err) {
-                console.log(err);
-                res.status(500).json({ message: 'Erro ao realizar login' });
-                return;
-            } else if (results.length > 0) {
-                // comparando a senha fornecida pelo usuário com a senha criptografada armazenada no banco de dados
-                const pass = bcrypt.compareSync(senha, results[0].senha);
-                console.log(pass);
-                if (pass) {
-
-                    // Gerando o token de autenticação
-                    const payload = { email: email };
-                    const options = { expiresIn: '1d', issuer: ISSUER };
-                    const secret = JWT_SECRET;
-                    const token = jwt.sign(payload, secret, options);
-
-                    // Enviando a resposta pro cliente
-                    res.json({ message: 'Login realizado com sucesso', token });
-                    return;
-                } else {
-                    res.status(401).json({ message: 'Email ou senha incorretos' });
-                    return;
-                }
-            } else {
-                res.status(401).json({ message: 'Email ou senha incorretos' });
-                return;
-            }
-
-        })
-    })
-
-    // Responsavel pelas requisições na raiz
-    app.get('/', (req, res) => {
-        res.send("Hello World!");
+    app.get('/logged', (req, res) => {
+        res.send('Logado');
     });
 
     // Iniciando o servidor
