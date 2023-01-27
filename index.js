@@ -20,6 +20,7 @@ const session = require('express-session');
 // importando as rotas
 const access = require('./routes/access');
 const user = require('./routes/user');
+const resetPass = require('./routes/resetPass');
 
 // Porta de funcionamento do servidor (não colocar no .env)
 const PORT = process.env.PORT || 3000;
@@ -43,7 +44,8 @@ async function main() {
     }));
 
 
-    // Rota de cadastro
+    // Rotas
+    app.use('/restore', resetPass);
     app.use('/access', access);
     app.use('/', user);
 

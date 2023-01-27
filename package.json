@@ -18,6 +18,7 @@
     "express-session": "^1.17.3",
     "jsonwebtoken": "^9.0.0",
     "mysql2": "^3.0.1",
+    "nodemailer": "^6.9.1",
     "validator": "^13.7.0"
   },
   "devDependencies": {

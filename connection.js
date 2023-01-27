@@ -7,10 +7,10 @@ require('dotenv').config();
 
 // Variaveis do banco
 const DB = {
-    HOST: process.env.HOST || 'localhost',
-    USER: process.env.USER || 'root',
-    PASS: process.env.PASS || '',
-    NAME: process.env.NAME || 'test'
+    HOST: process.env.DB_HOST || 'localhost',
+    USER: process.env.DB_USER || 'root',
+    PASS: process.env.DB_PASS || '',
+    NAME: process.env.DB_NAME || 'test'
 }
 
 // Conexão com o banco de dados

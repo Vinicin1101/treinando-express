@@ -1,9 +1,11 @@
 // importando o jwt
 const jwt = require('jsonwebtoken');
 
+// importando o dotenv
 const dotenv = require('dotenv');
 dotenv.config()
 
+// carregando o segredo do .env
 const SECRET = process.env.JWT_SECRET
 
 // função middleware (passada antes da requisição ser servida)
@@ -22,6 +24,5 @@ function verifyJWT(req, res, next) {
         next();
     });
 };
-
 
 module.exports = verifyJWT;

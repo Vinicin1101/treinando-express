@@ -18,9 +18,9 @@ const validator = require('validator');
 
 // Variaveis do auth token
 const JWT_SECRET = process.env.JWT_SECRET
-const ISSUER = process.env.ISSUER
+const JWT_ISSUER = process.env.JWT_ISSUER
 
-// Rate Limit (limita o numero de acessos no point-end)
+// Rate Limit (limita o numero de acessos no endpoint)
 /** 5 tentativas de login. Se um usuário exceder esse limite, eles receberão o alerta e sera bloqueado por 15 minutos*/
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos de countdown
@@ -28,7 +28,7 @@ const loginLimiter = rateLimit({
     message: "Muitas tentativas de login, tente novamente mais tarde."
 });
 
-// Point-end para cadastro de usuário no banco
+// endpoint para cadastro de usuário no banco
 router.post('/signup', (req, res) => {
 
     // Extraindo os dados do usuário vindo na resuisição
@@ -73,7 +73,7 @@ router.post('/signup', (req, res) => {
     });
 });
 
-// Point-end para login de usuário
+// endpoint para login de usuário
 router.post('/login', loginLimiter, (req, res) => {
 
     // Extraindo os dados do usuário vindo na resuisição
@@ -107,7 +107,7 @@ router.post('/login', loginLimiter, (req, res) => {
 
                 // Gerando o token de autenticação
                 const payload = { ID: results[0].ID }; // carga, no caso apenas o ID do usuário
-                const options = { expiresIn: '1d', issuer: ISSUER }; // tempo de expiração e emissor
+                const options = { expiresIn: '1d', issuer: JWT_ISSUER }; // tempo de expiração e emissor
                 const secret = JWT_SECRET; // Segredo para assinaturaa do token
                 const token = jwt.sign(payload, secret, options); // token final
 
