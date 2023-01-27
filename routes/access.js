@@ -16,15 +16,11 @@ const connection = require('./../connection');
 // importando a biblioteca de validações
 const validator = require('validator');
 
-// importando nosso verificador de token bolado
-const verifyJWT = require('./../verifyJWT');
-
-
 // Variaveis do auth token
 const JWT_SECRET = process.env.JWT_SECRET
 const ISSUER = process.env.ISSUER
 
-// Rate Limit
+// Rate Limit (limita o numero de acessos no point-end)
 /** 5 tentativas de login. Se um usuário exceder esse limite, eles receberão o alerta e sera bloqueado por 15 minutos*/
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos de countdown
@@ -32,6 +28,7 @@ const loginLimiter = rateLimit({
     message: "Muitas tentativas de login, tente novamente mais tarde."
 });
 
+// Point-end para cadastro de usuário no banco
 router.post('/signup', (req, res) => {
 
     // Extraindo os dados do usuário vindo na resuisição
@@ -62,6 +59,7 @@ router.post('/signup', (req, res) => {
 
         // Tratando erros
         if (err) {
+            console.log(err);
             // Email duplicado
             if (err.code.includes("ER_DUP_ENTRY")) {
                 return res.status(401).json({ message: 'Erro ao cadastrar usuário, email em uso' });
@@ -75,7 +73,7 @@ router.post('/signup', (req, res) => {
     });
 });
 
-// Rota de login
+// Point-end para login de usuário
 router.post('/login', loginLimiter, (req, res) => {
 
     // Extraindo os dados do usuário vindo na resuisição
@@ -89,7 +87,7 @@ router.post('/login', loginLimiter, (req, res) => {
     }
 
     // Preparando a string SQL
-    const sql = 'SELECT senha FROM usuarios WHERE email = ?';
+    const sql = 'SELECT senha, ID FROM usuarios WHERE email = ?';
 
     // dados que serão verificados no banco
     const data = [email];
@@ -108,15 +106,13 @@ router.post('/login', loginLimiter, (req, res) => {
             if (pass) {
 
                 // Gerando o token de autenticação
-                const payload = { email: email };
-                const options = { expiresIn: '1d', issuer: ISSUER };
-                const secret = JWT_SECRET;
-                const token = jwt.sign(payload, secret, options);
+                const payload = { ID: results[0].ID }; // carga, no caso apenas o ID do usuário
+                const options = { expiresIn: '1d', issuer: ISSUER }; // tempo de expiração e emissor
+                const secret = JWT_SECRET; // Segredo para assinaturaa do token
+                const token = jwt.sign(payload, secret, options); // token final
 
                 // Enviando a resposta pro cliente
-                // return res.json({ message: 'Login realizado com sucesso', token, auth: true });
-                req.session.token = token;
-                return res.redirect('/logged')
+                return res.json({ message: 'Login realizado com sucesso', token, auth: true });
             } else {
                 return res.status(401).json({ message: 'Email ou senha incorretos', auth: false });
             }
@@ -125,13 +121,7 @@ router.post('/login', loginLimiter, (req, res) => {
             return res.status(401).json({ message: 'Email ou senha incorretos', auth: false });
         }
 
-    })
-
-    // Só é acessível com um token válido
-    router.get('/logged', verifyJWT, (req, res) => {
-        res.send("Logged");
     });
 })
-
 
 module.exports = router;

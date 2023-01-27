@@ -6,19 +6,20 @@ const bodyParser = require('body-parser');
 
 // importando o dotenv
 const dotenv = require('dotenv');
-require('dotenv').config();
+dotenv.config();
 
 // importando a biblioteca que verifica o token
 const jwt = require('jsonwebtoken');
 
 // importando nosso verificador de token bolado
-const verifyJWT = require('./verifyJWT');
+const verifyJWT = require('./middlewares/verifyJWT');
 
 // importando o middleware de sessão
 const session = require('express-session');
 
 // importando as rotas
 const access = require('./routes/access');
+const user = require('./routes/user');
 
 // Porta de funcionamento do servidor (não colocar no .env)
 const PORT = process.env.PORT || 3000;
@@ -43,24 +44,9 @@ async function main() {
 
 
     // Rota de cadastro
-    app.use('/access', access)
+    app.use('/access', access);
+    app.use('/', user);
 
-    // Responsavel por servir a rota raiz
-    app.get('/', (req, res) => {
-        res.sendFile(__dirname + '/public/index.html');
-    });
-
-    app.get('/login', (req, res) => {
-        res.sendFile(__dirname + '/public/login.html');
-    });
-
-    app.get('/signup', (req, res) => {
-        res.sendFile(__dirname + '/public/sign.html');
-    });
-
-    app.get('/logged', (req, res) => {
-        res.send('Logado');
-    });
 
     // Iniciando o servidor
     app.listen(PORT, () => {
