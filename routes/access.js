@@ -118,12 +118,10 @@ router.post('/login', loginLimiter, (req, res) => {
                 req.session.token = token;
                 return res.redirect('/logged')
             } else {
-                // Senha incorreta (! esse comentário não pode ser público !)
                 return res.status(401).json({ message: 'Email ou senha incorretos', auth: false });
             }
 
         } else {
-            // Email incorreto (! esse comentário não pode ser público !)
             return res.status(401).json({ message: 'Email ou senha incorretos', auth: false });
         }
 
