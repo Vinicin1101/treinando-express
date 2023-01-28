@@ -9,6 +9,12 @@ const verifyJWT = require('../middlewares/verifyJWT');
 
 // Point-end para retornar os dados do usuário logado
 router.get('/user', verifyJWT, function (req, res) {
+    const decoded = req.payload;
+
+    const dataAtual = new Date().getTime() / 1000;
+    if (decoded.exp > dataAtual) {
+        return res.status(404).json({ message: 'Token inválido ou expirado' });
+    }
 
     // Capturando o ID do usuário (o ID é retornado dentro do payload, que é tratado no verifyJWT)
     const ID = req.payload.ID;
