@@ -76,8 +76,10 @@ router.post('/reset', async (req, res) => {
     // inserinido a nova senha no banco
     connection.query('UPDATE usuarios SET senha = ? WHERE email = ?', [hash, decoded.email], (err, fields) => {
         if (err) return res.status(500).json({ message: err.message });
-        console.log(fields);
         if (fields.affectedRows >= 1) return res.status(200).json({ message: 'Senha atualizada com sucesso' });
+
+        return res.status(400).json({ message: 'Não foi possivel atualizar a senha' });
+
     });
 
 });
