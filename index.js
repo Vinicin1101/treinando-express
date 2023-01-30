@@ -20,6 +20,7 @@ const session = require('express-session');
 // importando as rotas
 const access = require('./routes/access');
 const user = require('./routes/user');
+const requestPassReset = require('./routes/requestPassReset');
 const resetPass = require('./routes/resetPass');
 
 // Porta de funcionamento do servidor (não colocar no .env)
@@ -37,6 +38,7 @@ app.use(bodyParser.json());
 // função principal
 async function main() {
 
+    // definindo uma sessão
     app.use(session({
         secret: SECRET,
         resave: false,
@@ -45,15 +47,17 @@ async function main() {
 
 
     // Rotas
-    app.use('/restore', resetPass);
+    app.use('/restore', requestPassReset);
     app.use('/access', access);
+    app.use('/', resetPass);
     app.use('/', user);
 
 
     // Iniciando o servidor
     app.listen(PORT, () => {
-        console.log(`Servidor iniciado na porta ${PORT}`)
+        console.log(`Aplicação iniciada e rodando em: localhost:${PORT}`)
     });
 }
 
+// iniciando
 main();

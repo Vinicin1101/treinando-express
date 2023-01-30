@@ -13,7 +13,11 @@ const DB = {
     NAME: process.env.DB_NAME || 'test'
 }
 
+// Limpando o console
+console.clear()
+
 // Conexão com o banco de dados
+
 const connection = mysql.createConnection({
     host: DB.HOST,
     user: DB.USER,
@@ -21,6 +25,15 @@ const connection = mysql.createConnection({
     database: DB.NAME
 });
 
-connection.connect();
+connection.connect((err) => {
+    if (err) {
+        if (err.fatal) {
+            return console.error(`\n\x1B[31m[✕] Erro ao conectar com o banco de dados \n[${err.message}]\x1B[0m`);
+        }
+
+        return console.error(`\n\x1B[31m[✕] Erro ao conectar com o banco de dados \n[${err.sqlMessage}]\x1B[0m`);
+    }
+    return console.log(`\n\x1B[32m[✓] Banco de dados conectado!\x1B[0m \n`);
+});
 
 module.exports = connection;
