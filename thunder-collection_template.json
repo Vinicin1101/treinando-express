@@ -1,0 +1,108 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Modelo de requests",
+  "dateExported": "2023-01-30T21:52:01.151Z",
+  "version": "1.1",
+  "folders": [],
+  "requests": [
+    {
+      "_id": "f35a90ea-7770-4c54-aa79-69184e9c6ccc",
+      "colId": "508a66a3-197b-4824-90c8-475156b75307",
+      "containerId": "",
+      "name": "Link de redefinição",
+      "url": "coloque a url gerada no request Esqueci minha senha",
+      "method": "GET",
+      "sortNum": 40000,
+      "created": "2023-01-30T19:52:08.691Z",
+      "modified": "2023-01-30T21:20:07.122Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "aaee2096-05b7-4500-9bf1-729cb28dcaa1",
+      "colId": "508a66a3-197b-4824-90c8-475156b75307",
+      "containerId": "",
+      "name": "Sign Up",
+      "url": "127.0.0.1:3000/access/signup",
+      "method": "POST",
+      "sortNum": 50000,
+      "created": "2023-01-30T19:32:12.764Z",
+      "modified": "2023-01-30T21:18:00.282Z",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"nome\": \"nome-nao-vazio\",\n  \"email\": \"email-valido\",\n  \"senha\": \"senha-forte\"\n}",
+        "form": []
+      },
+      "tests": []
+    },
+    {
+      "_id": "e8bb06f4-681b-4776-82c9-b54727aeecce",
+      "colId": "508a66a3-197b-4824-90c8-475156b75307",
+      "containerId": "",
+      "name": "Nova senha",
+      "url": "127.0.0.1:3000/reset",
+      "method": "POST",
+      "sortNum": 50000,
+      "created": "2023-01-30T21:22:56.224Z",
+      "modified": "2023-01-30T21:30:34.932Z",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "<token retornado do link>"
+        }
+      ],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"NewPass\": \"nova-senha\"\n}",
+        "form": []
+      },
+      "auth": {
+        "type": "bearer",
+        "bearer": "<token retornado do link>"
+      },
+      "tests": []
+    },
+    {
+      "_id": "38cd7015-8ce6-4f62-b158-01b4cebb3787",
+      "colId": "508a66a3-197b-4824-90c8-475156b75307",
+      "containerId": "",
+      "name": "Login",
+      "url": "127.0.0.1:3000/access/login",
+      "method": "POST",
+      "sortNum": 60000,
+      "created": "2023-01-30T19:32:42.110Z",
+      "modified": "2023-01-30T21:31:57.496Z",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"email-valido\",\n  \"senha\": \"senha-forte\"\n}",
+        "form": []
+      },
+      "tests": []
+    },
+    {
+      "_id": "f01c01ed-811f-4f5b-a233-82e2d1b8f01e",
+      "colId": "508a66a3-197b-4824-90c8-475156b75307",
+      "containerId": "",
+      "name": "Esqueci minha senha",
+      "url": "127.0.0.1:3000/restore/forgotmypass",
+      "method": "POST",
+      "sortNum": 70000,
+      "created": "2023-01-30T19:35:15.757Z",
+      "modified": "2023-01-30T21:18:03.586Z",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": " {\n   \"email\": \"email-valido\"\n }",
+        "form": []
+      },
+      "tests": []
+    }
+  ]
+}
